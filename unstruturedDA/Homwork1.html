@@ -14034,6 +14034,8 @@ a.anchor-link {
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">wwe_file_names</span><span class="p">):</span>
     <span class="n">df_wwe_single</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
     <span class="n">df_wwe</span> <span class="o">=</span> <span class="n">df_wwe</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df_wwe_single</span><span class="p">)</span>
+
+<span class="n">df_wwe</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df_wwe</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span>
 </pre></div>
 
      </div>
@@ -14130,7 +14132,6 @@ a.anchor-link {
     <span class="n">start_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">target_date</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="o">-</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span> <span class="o">=</span> <span class="n">down_range</span><span class="p">)</span>
     <span class="n">end_date</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">target_date</span><span class="p">)</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span> <span class="o">=</span> <span class="n">up_range</span><span class="p">)</span>
     
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dates range are between: &quot;</span><span class="p">,</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">)</span>
     <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span> <span class="s1">&#39;d&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">date</span>
     <span class="k">return</span> <span class="n">dates</span>
 </pre></div>
@@ -14147,8 +14148,16 @@ a.anchor-link {
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#combining previous function together</span>
-<span class="k">def</span> <span class="nf">get_stock_stats</span><span class="p">(</span><span class="n">target_date</span><span class="p">,</span> <span class="n">ticker</span><span class="p">,</span> <span class="n">api</span><span class="p">,</span> <span class="n">csv</span><span class="p">,</span> <span class="n">up_range</span><span class="p">,</span> <span class="n">down_range</span><span class="p">):</span>
-    <span class="n">dates</span> <span class="o">=</span> <span class="n">pull_dates</span><span class="p">(</span><span class="n">target_date</span><span class="o">=</span> <span class="n">target_date</span><span class="p">,</span> <span class="n">up_range</span><span class="o">=</span> <span class="n">up_range</span><span class="p">,</span> <span class="n">down_range</span><span class="o">=</span> <span class="n">down_range</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">get_stock_stats</span><span class="p">(</span><span class="n">date_list</span><span class="p">,</span> <span class="n">ticker</span><span class="p">,</span> <span class="n">api</span><span class="p">,</span> <span class="n">csv</span><span class="p">,</span> <span class="n">up_range</span><span class="p">,</span> <span class="n">down_range</span><span class="p">):</span>
+
+    <span class="n">dates</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">target_date</span> <span class="ow">in</span> <span class="n">date_list</span><span class="p">:</span>
+        <span class="n">dates_temp</span> <span class="o">=</span> <span class="n">pull_dates</span><span class="p">(</span><span class="n">target_date</span><span class="o">=</span> <span class="n">target_date</span><span class="p">,</span> <span class="n">up_range</span><span class="o">=</span> <span class="n">up_range</span><span class="p">,</span> <span class="n">down_range</span><span class="o">=</span> <span class="n">down_range</span><span class="p">)</span>
+        <span class="n">dates</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">dates_temp</span><span class="p">)</span>
+    
+    <span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span>
+
+
     <span class="n">url</span> <span class="o">=</span> <span class="n">get_url</span><span class="p">(</span><span class="n">ticker</span><span class="p">,</span> <span class="n">api</span><span class="p">,</span> <span class="n">csv</span> <span class="p">)</span>
     
     <span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
@@ -14193,23 +14202,23 @@ a.anchor-link {
 </div>
 </div>
 
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">day</span> <span class="o">=</span> <span class="s1">&#39;2020-01-15&#39;</span>
-<span class="n">ticker</span> <span class="o">=</span> <span class="s1">&#39;AAPL&#39;</span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">date_list</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">df_wwe</span><span class="o">.</span><span class="n">date</span><span class="p">)</span>
+<span class="n">ticker</span> <span class="o">=</span> <span class="s1">&#39;WWE&#39;</span> 
 <span class="n">API_key</span> <span class="o">=</span> <span class="s1">&#39;M543IPRN9W3SOBPZ&#39;</span>
 
 
-<span class="n">records</span><span class="p">,</span><span class="n">close_dates</span> <span class="o">=</span>  <span class="n">get_stock_stats</span><span class="p">(</span><span class="n">target_date</span><span class="o">=</span> <span class="n">day</span><span class="p">,</span> 
+<span class="n">records</span><span class="p">,</span><span class="n">close_dates</span> <span class="o">=</span>  <span class="n">get_stock_stats</span><span class="p">(</span><span class="n">date_list</span> <span class="o">=</span> <span class="n">date_list</span><span class="p">,</span> 
                         <span class="n">ticker</span> <span class="o">=</span> <span class="n">ticker</span><span class="p">,</span> 
                         <span class="n">api</span><span class="o">=</span> <span class="n">API_key</span><span class="p">,</span> 
-                        <span class="n">csv</span><span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="c1">#csv form will return dataframe, json form will be np.array</span>
-                        <span class="n">up_range</span><span class="o">=</span> <span class="mi">10</span><span class="p">,</span> 
-                        <span class="n">down_range</span><span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+                        <span class="n">csv</span><span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="c1">#csv form will return dataframe, json form will be np.array</span>
+                        <span class="n">up_range</span><span class="o">=</span> <span class="mi">5</span><span class="p">,</span> 
+                        <span class="n">down_range</span><span class="o">=</span> <span class="mi">5</span><span class="p">)</span>
 
 <span class="c1">#the result will return the valid record, and the date that market is close</span>
 </pre></div>
@@ -14219,34 +14228,13 @@ a.anchor-link {
 </div>
 </div>
 
-<div class="jp-Cell-outputWrapper">
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>dates range are between:  2020-01-05 2020-01-25
-</pre>
-</div>
-</div>
-
-</div>
-
-</div>
-
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">records</span><span class="p">,</span> <span class="n">close_dates</span><span class="p">)</span> <span class="c1">#we decide to call the json file here, the result is slower than csv.</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">records</span><span class="p">,</span> <span class="s1">&#39;Market was closing on these dates:&#39;</span><span class="p">,</span><span class="n">close_dates</span><span class="p">)</span> <span class="c1">#we decide to call the csv file here, the result is faster than json.</span>
 </pre></div>
 
      </div>
@@ -14266,22 +14254,137 @@ a.anchor-link {
 
 
 
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output " data-mime-type="text/html">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
-<div class="jp-RenderedText jp-OutputArea-output " data-mime-type="text/plain">
-<pre>[(&#39;2020-01-06&#39;, &#39;293.7900&#39;, &#39;299.9600&#39;, &#39;292.7500&#39;, &#39;299.8000&#39;, &#39;29644644&#39;),
- (&#39;2020-01-07&#39;, &#39;299.8400&#39;, &#39;300.9000&#39;, &#39;297.4800&#39;, &#39;298.3900&#39;, &#39;27877655&#39;),
- (&#39;2020-01-08&#39;, &#39;297.1600&#39;, &#39;304.4400&#39;, &#39;297.1600&#39;, &#39;303.1900&#39;, &#39;33090946&#39;),
- (&#39;2020-01-09&#39;, &#39;307.2400&#39;, &#39;310.4300&#39;, &#39;306.2000&#39;, &#39;309.6300&#39;, &#39;42621542&#39;),
- (&#39;2020-01-10&#39;, &#39;310.6000&#39;, &#39;312.6700&#39;, &#39;308.2500&#39;, &#39;310.3300&#39;, &#39;35217272&#39;),
- (&#39;2020-01-13&#39;, &#39;311.6400&#39;, &#39;317.0700&#39;, &#39;311.1500&#39;, &#39;316.9600&#39;, &#39;30028742&#39;),
- (&#39;2020-01-14&#39;, &#39;316.7000&#39;, &#39;317.5700&#39;, &#39;312.1700&#39;, &#39;312.6800&#39;, &#39;40653457&#39;),
- (&#39;2020-01-15&#39;, &#39;311.8500&#39;, &#39;315.5000&#39;, &#39;309.5500&#39;, &#39;311.3400&#39;, &#39;30480882&#39;),
- (&#39;2020-01-16&#39;, &#39;313.5900&#39;, &#39;315.7000&#39;, &#39;312.0900&#39;, &#39;315.2400&#39;, &#39;27207254&#39;),
- (&#39;2020-01-17&#39;, &#39;316.2700&#39;, &#39;318.7400&#39;, &#39;315.0000&#39;, &#39;318.7300&#39;, &#39;34454117&#39;),
- (&#39;2020-01-21&#39;, &#39;317.1900&#39;, &#39;319.0200&#39;, &#39;316.0000&#39;, &#39;316.5700&#39;, &#39;27235039&#39;),
- (&#39;2020-01-22&#39;, &#39;318.5800&#39;, &#39;319.9900&#39;, &#39;317.3100&#39;, &#39;317.7000&#39;, &#39;25458115&#39;),
- (&#39;2020-01-23&#39;, &#39;317.9200&#39;, &#39;319.5600&#39;, &#39;315.6500&#39;, &#39;319.2300&#39;, &#39;26117993&#39;),
- (&#39;2020-01-24&#39;, &#39;320.2500&#39;, &#39;323.3300&#39;, &#39;317.5200&#39;, &#39;318.3100&#39;, &#39;36634380&#39;)]</pre>
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>date</th>
+      <th>open</th>
+      <th>high</th>
+      <th>low</th>
+      <th>close</th>
+      <th>volume</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2010-12-03</td>
+      <td>13.93</td>
+      <td>14.04</td>
+      <td>13.90</td>
+      <td>14.00</td>
+      <td>350400</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2010-12-02</td>
+      <td>13.95</td>
+      <td>14.05</td>
+      <td>13.93</td>
+      <td>14.00</td>
+      <td>236200</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2010-12-01</td>
+      <td>14.18</td>
+      <td>14.18</td>
+      <td>13.88</td>
+      <td>13.93</td>
+      <td>296800</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2010-11-30</td>
+      <td>13.90</td>
+      <td>14.09</td>
+      <td>13.90</td>
+      <td>14.02</td>
+      <td>230300</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2010-11-29</td>
+      <td>14.02</td>
+      <td>14.14</td>
+      <td>13.88</td>
+      <td>14.02</td>
+      <td>200400</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>220</th>
+      <td>2002-06-27</td>
+      <td>14.30</td>
+      <td>14.45</td>
+      <td>13.15</td>
+      <td>13.55</td>
+      <td>82200</td>
+    </tr>
+    <tr>
+      <th>221</th>
+      <td>2002-06-26</td>
+      <td>13.50</td>
+      <td>14.60</td>
+      <td>13.50</td>
+      <td>14.20</td>
+      <td>106100</td>
+    </tr>
+    <tr>
+      <th>222</th>
+      <td>2002-06-25</td>
+      <td>13.60</td>
+      <td>13.81</td>
+      <td>13.55</td>
+      <td>13.69</td>
+      <td>39600</td>
+    </tr>
+    <tr>
+      <th>223</th>
+      <td>2002-06-24</td>
+      <td>13.60</td>
+      <td>13.65</td>
+      <td>13.20</td>
+      <td>13.55</td>
+      <td>52100</td>
+    </tr>
+    <tr>
+      <th>224</th>
+      <td>2002-06-21</td>
+      <td>13.60</td>
+      <td>13.79</td>
+      <td>13.45</td>
+      <td>13.70</td>
+      <td>31100</td>
+    </tr>
+  </tbody>
+</table>
+<p>225 rows × 6 columns</p>
+</div>
 </div>
 
 </div>
@@ -14295,13 +14398,158 @@ a.anchor-link {
 
 
 <div class="jp-RenderedText jp-OutputArea-output " data-mime-type="text/plain">
-<pre>[&#39;2020-01-05&#39;,
- &#39;2020-01-11&#39;,
- &#39;2020-01-12&#39;,
- &#39;2020-01-18&#39;,
- &#39;2020-01-19&#39;,
- &#39;2020-01-20&#39;,
- &#39;2020-01-25&#39;]</pre>
+<pre>&#39;Market was closing on these dates:&#39;</pre>
+</div>
+
+</div>
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div class="jp-RenderedText jp-OutputArea-output " data-mime-type="text/plain">
+<pre>[&#39;2010-02-06&#39;,
+ &#39;2010-02-07&#39;,
+ &#39;2010-02-13&#39;,
+ &#39;2010-02-14&#39;,
+ &#39;2010-02-15&#39;,
+ &#39;2008-02-09&#39;,
+ &#39;2008-02-10&#39;,
+ &#39;2008-02-16&#39;,
+ &#39;2008-02-17&#39;,
+ &#39;2007-02-10&#39;,
+ &#39;2007-02-11&#39;,
+ &#39;2007-02-17&#39;,
+ &#39;2007-02-18&#39;,
+ &#39;2006-06-10&#39;,
+ &#39;2006-06-11&#39;,
+ &#39;2006-06-17&#39;,
+ &#39;2006-06-18&#39;,
+ &#39;2003-11-15&#39;,
+ &#39;2003-11-16&#39;,
+ &#39;2003-11-22&#39;,
+ &#39;2004-02-14&#39;,
+ &#39;2004-02-15&#39;,
+ &#39;2004-02-16&#39;,
+ &#39;2004-02-21&#39;,
+ &#39;2004-02-22&#39;,
+ &#39;2009-03-14&#39;,
+ &#39;2009-03-15&#39;,
+ &#39;2009-03-21&#39;,
+ &#39;2009-03-22&#39;,
+ &#39;2005-11-26&#39;,
+ &#39;2005-11-27&#39;,
+ &#39;2005-12-03&#39;,
+ &#39;2005-12-04&#39;,
+ &#39;2007-10-27&#39;,
+ &#39;2007-10-28&#39;,
+ &#39;2007-11-03&#39;,
+ &#39;2007-11-04&#39;,
+ &#39;2004-06-19&#39;,
+ &#39;2004-06-20&#39;,
+ &#39;2004-06-26&#39;,
+ &#39;2004-06-27&#39;,
+ &#39;2004-08-21&#39;,
+ &#39;2004-08-22&#39;,
+ &#39;2004-08-28&#39;,
+ &#39;2005-02-19&#39;,
+ &#39;2005-02-20&#39;,
+ &#39;2005-02-21&#39;,
+ &#39;2005-02-26&#39;,
+ &#39;2005-02-27&#39;,
+ &#39;2004-11-20&#39;,
+ &#39;2004-11-21&#39;,
+ &#39;2004-11-25&#39;,
+ &#39;2004-11-27&#39;,
+ &#39;2004-11-28&#39;,
+ &#39;2009-02-21&#39;,
+ &#39;2009-02-22&#39;,
+ &#39;2009-02-28&#39;,
+ &#39;2009-03-01&#39;,
+ &#39;2003-08-23&#39;,
+ &#39;2003-08-24&#39;,
+ &#39;2003-08-30&#39;,
+ &#39;2003-08-31&#39;,
+ &#39;2002-06-22&#39;,
+ &#39;2002-06-23&#39;,
+ &#39;2002-06-29&#39;,
+ &#39;2002-06-30&#39;,
+ &#39;2007-07-28&#39;,
+ &#39;2007-07-29&#39;,
+ &#39;2007-08-04&#39;,
+ &#39;2007-08-05&#39;,
+ &#39;2006-02-25&#39;,
+ &#39;2006-02-26&#39;,
+ &#39;2006-03-04&#39;,
+ &#39;2006-03-05&#39;,
+ &#39;2005-06-25&#39;,
+ &#39;2005-06-26&#39;,
+ &#39;2005-07-02&#39;,
+ &#39;2005-07-03&#39;,
+ &#39;2005-07-04&#39;,
+ &#39;2010-11-25&#39;,
+ &#39;2010-11-27&#39;,
+ &#39;2010-11-28&#39;,
+ &#39;2010-12-04&#39;,
+ &#39;2010-12-05&#39;,
+ &#39;2006-08-26&#39;,
+ &#39;2006-08-27&#39;,
+ &#39;2006-09-02&#39;,
+ &#39;2006-09-03&#39;,
+ &#39;2006-09-04&#39;,
+ &#39;2007-04-28&#39;,
+ &#39;2007-04-29&#39;,
+ &#39;2007-05-05&#39;,
+ &#39;2007-05-06&#39;,
+ &#39;2010-10-30&#39;,
+ &#39;2010-10-31&#39;,
+ &#39;2010-11-06&#39;,
+ &#39;2010-11-07&#39;,
+ &#39;2008-08-02&#39;,
+ &#39;2008-08-03&#39;,
+ &#39;2008-08-09&#39;,
+ &#39;2008-08-10&#39;,
+ &#39;2010-07-31&#39;,
+ &#39;2010-08-01&#39;,
+ &#39;2010-08-07&#39;,
+ &#39;2010-08-08&#39;,
+ &#39;2006-12-02&#39;,
+ &#39;2006-12-03&#39;,
+ &#39;2006-12-09&#39;,
+ &#39;2006-12-10&#39;,
+ &#39;2009-10-31&#39;,
+ &#39;2009-11-01&#39;,
+ &#39;2009-11-07&#39;,
+ &#39;2009-11-08&#39;,
+ &#39;2009-08-01&#39;,
+ &#39;2009-08-02&#39;,
+ &#39;2009-08-08&#39;,
+ &#39;2009-08-09&#39;,
+ &#39;2008-05-03&#39;,
+ &#39;2008-05-04&#39;,
+ &#39;2008-05-10&#39;,
+ &#39;2008-05-11&#39;,
+ &#39;2010-05-01&#39;,
+ &#39;2010-05-02&#39;,
+ &#39;2010-05-08&#39;,
+ &#39;2010-05-09&#39;,
+ &#39;2008-11-01&#39;,
+ &#39;2008-11-02&#39;,
+ &#39;2008-11-08&#39;,
+ &#39;2008-11-09&#39;,
+ &#39;2009-05-02&#39;,
+ &#39;2009-05-03&#39;,
+ &#39;2009-05-09&#39;,
+ &#39;2009-05-10&#39;,
+ &#39;2005-09-03&#39;,
+ &#39;2005-09-04&#39;,
+ &#39;2005-09-05&#39;,
+ &#39;2005-09-10&#39;,
+ &#39;2005-09-11&#39;]</pre>
 </div>
 
 </div>
